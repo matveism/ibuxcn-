@@ -42,13 +42,14 @@
         gap: 16px;
     }
 
+    /* Hide mobile menu button on desktop */
     .menu-btn {
         background: transparent;
         border: none;
         border-radius: 50%;
         width: 42px;
         height: 42px;
-        display: flex;
+        display: none;  /* Hidden by default on desktop */
         align-items: center;
         justify-content: center;
         color: #ffffff;
@@ -56,6 +57,14 @@
         cursor: pointer;
         transition: background 0.2s;
     }
+    
+    /* Show only on mobile */
+    @media (max-width: 768px) {
+        .menu-btn {
+            display: flex;
+        }
+    }
+    
     .menu-btn:hover {
         background: rgba(255,255,255,0.08);
     }
@@ -66,6 +75,53 @@
         font-weight: 500;
         letter-spacing: 0.3px;
         text-transform: uppercase;
+    }
+
+    /* New center buttons group */
+    .center-buttons {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 auto;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    @media (max-width: 768px) {
+        .center-buttons {
+            display: none;  /* Hide on mobile */
+        }
+    }
+    
+    .nav-btn {
+        background: transparent;
+        border: 1px solid #4a4d50;
+        border-radius: 20px;
+        padding: 6px 16px;
+        color: #e0e0e0;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .nav-btn i {
+        color: #ff80ab;
+        font-size: 16px;
+    }
+    
+    .nav-btn:hover {
+        background: #ff80ab;
+        color: #202124;
+        border-color: #ff80ab;
+    }
+    
+    .nav-btn:hover i {
+        color: #202124;
     }
 
     .right-icons {
@@ -225,6 +281,13 @@
         box-shadow: 0 12px 24px rgba(0,0,0,0.6);
         display: none;
         z-index: 999;
+    }
+
+    /* Only show slide menu when menu button is clicked (mobile) */
+    @media (min-width: 769px) {
+        .slide-menu {
+            display: none !important;  /* Never show on desktop */
+        }
     }
 
     .slide-menu .accordion-item {
@@ -482,6 +545,16 @@
         <div class="menu-btn" onclick="toggleMenu()"><i class="bi bi-list"></i></div>
         <div class="logo">iBuxCn</div>
     </div>
+    
+    <!-- New center buttons group (desktop only) -->
+    <div class="center-buttons">
+        <button class="nav-btn" onclick="showPage('earn')"><i class="bi bi-cash-stack"></i> Earn</button>
+        <button class="nav-btn" onclick="showPage('shop')"><i class="bi bi-shop"></i> Shop</button>
+        <button class="nav-btn" onclick="showPage('leaders')"><i class="bi bi-trophy"></i> Leaders</button>
+        <button class="nav-btn" onclick="showPage('help')"><i class="bi bi-question-circle"></i> Help</button>
+        <button class="nav-btn" onclick="showPage('chatpage')"><i class="bi bi-chat"></i> Chat</button>
+    </div>
+    
     <div class="right-icons">
         <div class="icon-box" id="ticketBtn"><i class="bi bi-ticket-perforated"></i></div>
         <div class="icon-box" id="notifIcon"><i class="bi bi-megaphone"></i><span class="notify">0</span></div>
@@ -528,7 +601,7 @@
 <div class="user-logs-container"><div class="logs-row"><div class="log-item"><span class="log-prefix">M</span><span class="log-value">5</span><span class="log-suffix">coin</span></div><span class="log-divider">|</span><div class="log-item"><span class="log-prefix">D</span><span class="log-value">12</span><span class="log-suffix">gems</span></div><span class="log-divider">|</span><div class="log-item"><span class="log-prefix">W</span><span class="log-value">3</span><span class="log-suffix">tickets</span></div><span class="log-divider">|</span><div class="log-item"><span class="log-prefix">L</span><span class="log-value">88</span><span class="log-suffix">points</span></div><span class="log-divider">|</span><div class="log-item"><span class="log-prefix">R</span><span class="log-value">23</span><span class="log-suffix">rewards</span></div></div></div>
 
 <!-- BOTTOM IMAGE -->
-<div class="image-section-bottom"><img src="https://i.imgur.com/jvL6rHc.png" alt="banner" loading="lazy"></div>
+<div class="image-section-bottom"><img src="https://i.imgur.com/mBrpwVv.jpeg" alt="banner" loading="lazy"></div>
 
 <!-- STATS -->
 <div class="stats-modern"><div class="stats-card"><div class="stats-row"><div class="stat-item"><span class="stat-number">$0.00</span><span class="stat-label">PAID</span></div><div class="stat-divider"></div><div class="stat-item"><span class="stat-number">0</span><span class="stat-label">USERS</span></div><div class="stat-divider"></div><div class="stat-item"><span class="stat-number">0</span><span class="stat-label">TASKS ✓</span></div></div></div></div>
