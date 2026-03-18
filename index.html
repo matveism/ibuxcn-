@@ -2,29 +2,1100 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Full Screen Iframe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>iBuxCn · Android 6 · Login</title>
+    <!-- Bootstrap grid & icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Roboto = Android 6 -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Remove default browser padding and margin */
-        html, body {
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #202124;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
-            padding: 0;
+            overflow-x: hidden;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .android-container {
             width: 100%;
-            height: 100%;
-            overflow: hidden; /* Prevent scrollbars on the main page */
+            max-width: 980px;
+            margin: 0 auto;
+            background: #202124;
+            box-shadow: 0 0 30px rgba(0,0,0,0.7);
+            position: relative;
+        }
+        .phone-column { width: 100%; background: inherit; }
+
+        /* ----- top bar ----- */
+        .topbar {
+            background: #202124; height: 60px; display: flex; align-items: center;
+            justify-content: space-between; padding: 0 16px; border-bottom: 1px solid #4a4d50;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3); position: relative; z-index: 1001;
+        }
+        .left-group { display: flex; align-items: center; gap: 16px; }
+        .menu-btn {
+            background: transparent; border: none; border-radius: 50%; width: 42px; height: 42px;
+            display: none; align-items: center; justify-content: center; color: #fff;
+            font-size: 24px; cursor: pointer;
+        }
+        @media (max-width: 768px) { .menu-btn { display: flex; } }
+        .menu-btn:hover { background: rgba(255,255,255,0.08); }
+        .logo { 
+            color: #ff80ab; font-size: 22px; font-weight: 500; text-transform: uppercase;
+            cursor: pointer;
         }
 
-        iframe {
-            display: block;  /* Remove extra space below iframe */
-            width: 100vw;    /* 100% of the viewport width */
-            height: 100vh;   /* 100% of the viewport height */
-            border: none;    /* Remove iframe border */
+        /* User info in top bar */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #e0e0e0;
+            font-size: 14px;
+            background: #2c2f31;
+            padding: 4px 12px 4px 8px;
+            border-radius: 30px;
+            border: 1px solid #4a4d50;
+            cursor: pointer;
+        }
+        .user-info i {
+            color: #ff80ab;
+            font-size: 18px;
+        }
+        .user-info span {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .logout-btn {
+            background: transparent;
+            border: none;
+            color: #aaa;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+        .logout-btn:hover {
+            background: #ff80ab;
+            color: #202124;
+        }
+
+        .center-buttons {
+            display: flex; align-items: center; gap: 8px; margin: 0 auto;
+            position: absolute; left: 50%; transform: translateX(-50%);
+        }
+        @media (max-width: 768px) { .center-buttons { display: none; } }
+        .nav-btn {
+            background: transparent; border: 1px solid #4a4d50; border-radius: 20px;
+            padding: 5px 14px; color: #e0e0e0; font-size: 13.5px; font-weight: 500;
+            cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap;
+        }
+        .nav-btn i { color: #ff80ab; font-size: 15px; }
+        .nav-btn:hover { background: #ff80ab; color: #202124; border-color: #ff80ab; }
+        .nav-btn:hover i { color: #202124; }
+
+        .right-icons {
+            display: flex; align-items: center; gap: 18px;
+        }
+        .icon-box {
+            position: relative; color: #f0f0f0; font-size: 23px; cursor: pointer;
+            width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; transition: color 0.2s;
+        }
+        .icon-box:hover { background: rgba(255,255,255,0.08); color: #ff80ab; }
+        .notify {
+            position: absolute; top: 1px; right: 1px; background: #ff80ab; color: #121212;
+            font-size: 10px; border-radius: 50%; width: 16px; height: 16px;
+            display: flex; align-items: center; justify-content: center; font-weight: 500;
+            box-shadow: 0 2px 4px black;
+        }
+
+        /* Login Modal */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-modal.active {
+            display: flex;
+        }
+        .login-card {
+            background: #2c2f31;
+            border-radius: 28px;
+            padding: 32px;
+            width: 90%;
+            max-width: 400px;
+            border: 2px solid #ff80ab;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            position: relative;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .login-header h2 {
+            color: #ff80ab;
+            font-size: 28px;
+            font-weight: 500;
+        }
+        .login-header p {
+            color: #aaa;
+            font-size: 14px;
+        }
+        .login-input {
+            width: 100%;
+            padding: 14px 16px;
+            margin: 8px 0;
+            background: #3f4245;
+            border: 1px solid #4a4d50;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+        }
+        .login-input:focus {
+            outline: none;
+            border-color: #ff80ab;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #ff80ab;
+            color: #202124;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 16px 0 8px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .login-btn:hover {
+            opacity: 0.9;
+        }
+        .login-switch {
+            text-align: center;
+            color: #aaa;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+        .login-switch a {
+            color: #ff80ab;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .login-error {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 8px;
+            text-align: center;
+            display: none;
+        }
+        .close-login {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 32px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .close-login:hover {
+            background: rgba(255,255,255,0.1);
+            color: #ff80ab;
+        }
+
+        /* Profile dropdown */
+        .profile-dropdown {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            background: #2c2f31;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 12px 28px 0 rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1200;
+            min-width: 260px;
+            border-left: 4px solid #ff80ab;
+            color: #f0f0f0;
+        }
+        .profile-dropdown.active {
+            display: block;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #404448;
+        }
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            background: #ff80ab;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #202124;
+            font-size: 24px;
+            font-weight: 500;
+        }
+        .profile-info h4 {
+            margin: 0;
+            color: #ff80ab;
+        }
+        .profile-info p {
+            margin: 4px 0 0;
+            color: #aaa;
+            font-size: 12px;
+        }
+        .profile-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .profile-stat {
+            text-align: center;
+        }
+        .profile-stat .number {
+            color: #ff80ab;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .profile-stat .label {
+            color: #aaa;
+            font-size: 11px;
+        }
+        .profile-menu-item {
+            width: 100%;
+            background: #3f4245;
+            border: none;
+            color: #f0f0f0;
+            text-align: left;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .profile-menu-item:hover {
+            background: #505457;
+            color: #ff80ab;
+        }
+
+        /* notif dropdown */
+        .notif-dropdown {
+            position: absolute; top: 70px; right: 70px; background: #2c2f31; border: none;
+            border-radius: 12px; padding: 18px 24px; box-shadow: 0 12px 28px 0 rgba(0,0,0,0.5);
+            display: none; z-index: 1200; min-width: 240px; border-left: 4px solid #ff80ab;
+            color: #f0f0f0;
+        }
+        .notif-dropdown p { margin: 0; font-size: 15px; display: flex; gap: 10px; align-items: center; }
+
+        /* chat panel */
+        .chat-panel {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(100%);
+            width: 100%; max-width: 980px; background: #2f3133; z-index: 3000;
+            transition: transform 0.3s ease-out; box-shadow: 0 -6px 25px rgba(0,0,0,0.7);
+            border-top-left-radius: 24px; border-top-right-radius: 24px;
+            display: flex; flex-direction: column; border-top: 2px solid #ff80ab;
+        }
+        .chat-panel.open { transform: translateX(-50%) translateY(0); }
+        .chat-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 22px; border-bottom: 1px solid #404447; background: #292b2d;
+            border-top-left-radius: 24px; border-top-right-radius: 24px;
+        }
+        .chat-header h3 { color: #ff80ab; font-size: 20px; font-weight: 500; margin: 0; }
+        .close-chat {
+            background: none; border: none; color: #aaa; font-size: 32px; cursor: pointer;
+            width: 42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+        }
+        .close-chat:hover { background: rgba(255,255,255,0.1); color: #ff80ab; }
+        .chat-body { flex: 1; padding: 24px; color: #ccc; font-size: 16px; overflow-y: auto; max-height: 400px; }
+
+        /* balance bar */
+        .balance-bar {
+            background: #35373a; height: 48px; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; border-bottom: 1px solid #4a4d50; position: relative; z-index: 1000;
+            font-weight: 500; color: #fff;
+        }
+        .points-main { color: #ff80ab; font-weight: 500; }
+        .points-second { color: #a0e7a0; margin-left: 12px; font-weight: 500; }
+        .points-label { color: #a0e7a0; margin-left: 4px; }
+        .balance-bar span.sep { color: #aaa; margin: 0 8px; }
+
+        /* slide menu */
+        .slide-menu {
+            position: absolute; top: 60px; left: 0; width: 100%; background: #2c2f31;
+            border-bottom: 1px solid #404448; box-shadow: 0 12px 24px rgba(0,0,0,0.6);
+            display: none; z-index: 999;
+        }
+        @media (min-width: 769px) { .slide-menu { display: none !important; } }
+        .slide-menu .accordion-item { background: #2c2f31; border: none; }
+        .slide-menu .accordion-button {
+            background: #2c2f31; color: #eee; border-radius: 0; font-weight: 500;
+            padding: 14px 20px; font-size: 16px; border-bottom: 1px solid #404448; box-shadow: none !important;
+        }
+        .slide-menu .accordion-button:not(.collapsed) { background: #383b3e; color: #ff80ab; }
+        .slide-menu .accordion-body { background: #232628; padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; }
+        .page-btn {
+            width: 100%; background: #3f4245; border: none; color: #f0f0f0; font-weight: 400;
+            text-align: left; padding: 12px 16px; border-radius: 4px; font-size: 16px;
+            display: flex; align-items: center; gap: 16px; border-left: 3px solid transparent;
+        }
+        .page-btn i { color: #ff80ab; font-size: 22px; width: 32px; }
+        .page-btn:hover { background: #505457; border-left-color: #ff80ab; }
+
+        /* image */
+        .image-section-bottom {
+            width: 100%; padding: 16px 16px 8px; display: flex; justify-content: center;
+        }
+        .image-section-bottom img {
+            max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+            background: #282a2c;
+        }
+
+        /* user logs */
+        .user-logs-container {
+            width: 100%; background: #2c2f31; overflow-x: auto; white-space: nowrap;
+            padding: 12px 0; border-top: 1px solid #404448; border-bottom: 1px solid #404448;
+        }
+        .logs-row {
+            display: inline-flex; align-items: center; gap: 8px; padding: 0 16px;
+        }
+        .log-item {
+            display: inline-flex; align-items: center; gap: 5px; background: #3f4245;
+            padding: 5px 14px; border-radius: 30px; font-size: 14px; color: #eee;
+        }
+        .log-item .log-prefix { color: #ff80ab; font-weight: 500; }
+        .log-item .log-value { color: #b3f0b3; font-weight: 500; }
+        .log-divider { color: #555; font-size: 16px; }
+
+        /* stats */
+        .stats-modern { padding: 20px 16px 10px; }
+        .stats-card {
+            background: #2f3133; border-radius: 18px; padding: 20px 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: 1px solid #404448;
+        }
+        .stats-row { display: flex; align-items: stretch; justify-content: space-around; }
+        .stat-item { flex:1; text-align:center; }
+        .stat-number { font-size: 26px; font-weight: 500; color: #ff80ab; }
+        .stat-label { font-size: 13px; color: #aaa; text-transform: uppercase; padding-top: 4px; }
+        .stat-divider { width: 1px; background: #404448; margin: 0 4px; }
+
+        /* why & faq */
+        .why-section { padding: 8px 16px 16px; }
+        .why-card {
+            background: #2f3133; border-radius: 22px; padding: 20px 18px; border: 1px solid #404448;
+        }
+        .why-title {
+            font-size: 20px; font-weight: 500; color: #ff80ab; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #404448; padding-bottom: 10px;
+        }
+        .why-content { color: #ddd; font-size: 15px; display: flex; flex-direction: column; gap: 14px; }
+        .why-content p { margin:0; display:flex; gap:12px; align-items:flex-start; }
+
+        .faq-section { padding: 10px 16px 32px; }
+        .faq-card {
+            background: #2f3133; border-radius: 26px; padding: 22px 18px; border: 1px solid #404448;
+        }
+        .faq-header h2 { color: #ff80ab; font-size: 24px; font-weight: 500; display: flex; gap: 10px; margin-bottom: 6px; }
+        .faq-list { display: flex; flex-direction: column; gap: 16px; }
+        .faq-question { color: #ff80ab; font-size: 17px; font-weight: 500; margin-bottom: 4px; display: flex; gap: 10px; }
+        .faq-answer { color: #ccc; font-size: 15px; padding-left: 28px; }
+
+        /* page sections */
+        .page-section {
+            width: 100%; padding: 16px 16px 24px; display: none; justify-content: center;
+        }
+        .page-section.active-page { display: flex; }
+        .page-card {
+            background: #2f3133; border-radius: 26px; padding: 24px 20px; width: 100%;
+            max-width: 720px; border: 1px solid #404448; box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+        }
+        .page-title {
+            font-size: 26px; font-weight: 500; color: #ff80ab; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 12px; border-bottom: 2px solid #404448; padding-bottom: 10px;
+        }
+        .page-content { color: #ddd; font-size: 16px; }
+        .mock-item {
+            background: rgba(0,0,0,0.2); border-radius: 16px; padding: 14px 16px;
+            margin: 12px 0; border: 1px solid #404448; display: flex; align-items: center; gap: 16px;
+        }
+
+        /* popups */
+        .popup-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); display:none; z-index:2000;
+        }
+        .popup-container {
+            position:fixed; background:#323436; border-radius:18px; padding:22px; width:320px; max-width:90%;
+            top:50%; left:50%; transform:translate(-50%,-50%); border:1px solid #5f5f5f; display:none; z-index:2100; color:white;
+        }
+        .close-popup { background:none; border:none; color:#aaa; font-size:30px; cursor: pointer; }
+        .redeem-btn { background:#ff80ab; color:#121212; border:none; padding:10px; border-radius:6px; font-weight:500; width:100%; margin-top:14px; cursor: pointer; }
+        .overlay {
+            position: fixed; width:100%; height:100%; background: rgba(0,0,0,0.5); display:none; z-index:998; top:0; left:0;
+        }
+        .chat-message { background: #3b3e41; padding: 8px 12px; border-radius: 18px; margin-bottom: 8px; max-width: 80%; }
+        .chat-message small { color: #aaa; font-size: 11px; }
+        
+        /* Loading spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #ff80ab;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <iframe src="https://script.google.com/macros/s/AKfycbwqjzEQ1TuZ1iQiBV4EFyYBGw0YCrZ1pSZli3VY2JRSPG-AbgIy5Otr38yrYp18X5Rt/exec"
-            title="Embedded Google Apps Script">
-    </iframe>
+<div class="android-container">
+<div class="phone-column">
+
+<!-- Login Modal -->
+<div class="login-modal" id="loginModal">
+    <button class="close-login" onclick="closeLoginModal()">&times;</button>
+    <div class="login-card">
+        <div class="login-header">
+            <h2>iBuxCn</h2>
+            <p>Login to your account</p>
+        </div>
+        <div id="loginForm">
+            <input type="text" class="login-input" id="loginUsername" placeholder="Username" autocomplete="off">
+            <input type="password" class="login-input" id="loginPassword" placeholder="Password">
+            <div class="login-error" id="loginError">Invalid username or password</div>
+            <button class="login-btn" onclick="handleLogin()" id="loginBtn">Login</button>
+            <div class="login-switch">
+                Don't have an account? <a onclick="showRegister()">Register</a>
+            </div>
+        </div>
+        <div id="registerForm" style="display: none;">
+            <input type="text" class="login-input" id="regUsername" placeholder="Username" autocomplete="off">
+            <input type="password" class="login-input" id="regPassword" placeholder="Password">
+            <input type="password" class="login-input" id="regConfirm" placeholder="Confirm Password">
+            <input type="text" class="login-input" id="regEmail" placeholder="Email (optional)">
+            <div class="login-error" id="registerError"></div>
+            <button class="login-btn" onclick="handleRegister()" id="registerBtn">Register</button>
+            <div class="login-switch">
+                Already have an account? <a onclick="showLogin()">Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Dropdown -->
+<div class="profile-dropdown" id="profileDropdown">
+    <div class="profile-header">
+        <div class="profile-avatar" id="profileAvatar">U</div>
+        <div class="profile-info">
+            <h4 id="profileName">Loading...</h4>
+            <p id="profileEmail">guest@ibuxcn.com</p>
+        </div>
+    </div>
+    <div class="profile-stats">
+        <div class="profile-stat">
+            <div class="number" id="profileBalance">0</div>
+            <div class="label">Balance</div>
+        </div>
+        <div class="profile-stat">
+            <div class="number" id="profilePts">0</div>
+            <div class="label">PTS</div>
+        </div>
+        <div class="profile-stat">
+            <div class="number" id="profileTasks">0</div>
+            <div class="label">Tasks</div>
+        </div>
+    </div>
+    <button class="profile-menu-item" onclick="showPage('profile')"><i class="bi bi-person"></i> My Profile</button>
+    <button class="profile-menu-item" onclick="showPage('earnings')"><i class="bi bi-cash-stack"></i> My Earnings</button>
+    <button class="profile-menu-item" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
+</div>
+
+<!-- overlay & popups -->
+<div class="overlay" id="overlay" onclick="closeAllMenus()"></div>
+<div class="popup-overlay" id="popupOverlay" onclick="closePopup()"></div>
+<div class="popup-container" id="popupContainer">
+    <div class="popup-header d-flex justify-content-between align-items-center border-bottom pb-2 mb-3" style="border-color:#555!important;">
+        <h3 class="text-pink" style="color:#ff80ab;">Redeem Code</h3>
+        <button class="close-popup" onclick="closePopup()">&times;</button>
+    </div>
+    <div class="popup-form">
+        <label class="text-light">Enter code</label>
+        <input type="text" id="redeemCode" class="form-control bg-dark text-white border-secondary" placeholder="e.g., BONUS2024">
+        <button class="redeem-btn" onclick="redeemCode()" id="redeemBtn">Redeem</button>
+    </div>
+</div>
+
+<!-- CHAT PANEL -->
+<div class="chat-panel" id="chatPanel">
+    <div class="chat-header">
+        <h3><i class="bi bi-chat-dots-fill me-2"></i>Community Chat</h3>
+        <button class="close-chat" onclick="closeChat()">&times;</button>
+    </div>
+    <div class="chat-body" id="chatBody">
+        <div id="chatMessagesContainer">Loading messages...</div>
+    </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <div class="left-group">
+        <div class="menu-btn" onclick="toggleMenu()"><i class="bi bi-list"></i></div>
+        <div class="logo" onclick="showLoginModal()">iBuxCn</div>
+    </div>
+    
+    <!-- User info (visible when logged in) -->
+    <div id="userInfoContainer" style="display: none;" onclick="toggleProfileDropdown()">
+        <div class="user-info">
+            <i class="bi bi-person-circle"></i>
+            <span id="userNameDisplay">Guest</span>
+            <button class="logout-btn" onclick="event.stopPropagation(); logout()">✕</button>
+        </div>
+    </div>
+    
+    <!-- center buttons -->
+    <div class="center-buttons">
+        <button class="nav-btn" onclick="showPage('earn')"><i class="bi bi-cash-stack"></i> Earn</button>
+        <button class="nav-btn" onclick="showPage('shop')"><i class="bi bi-shop"></i> Shop</button>
+        <button class="nav-btn" onclick="showPage('leaders')"><i class="bi bi-trophy"></i> Leaders</button>
+        <button class="nav-btn" onclick="showPage('help')"><i class="bi bi-question-circle"></i> Help</button>
+        <button class="nav-btn" onclick="showPage('chatpage')"><i class="bi bi-chat"></i> Chat</button>
+    </div>
+    
+    <div class="right-icons">
+        <div class="icon-box" onclick="openPopup()"><i class="bi bi-ticket-perforated"></i></div>
+        <div class="icon-box" onclick="toggleNotifications()"><i class="bi bi-megaphone"></i><span class="notify" id="notifyCount">0</span></div>
+        <div class="icon-box" onclick="openChat()"><i class="bi bi-chat-dots"></i><span class="notify" id="chatNotify">0</span></div>
+    </div>
+</div>
+
+<!-- notification dropdown -->
+<div class="notif-dropdown" id="notifDropdown">
+    <p><i class="bi bi-bell-slash"></i> <span id="notifMessage">No notifications</span></p>
+</div>
+
+<!-- BALANCE BAR -->
+<div class="balance-bar" id="balanceBar">
+    <span class="points-main" id="mainBalance">0.00</span><span class="sep">|</span><span class="points-second" id="ptsBalance">0.00</span><span class="points-label">PTS</span>
+</div>
+
+<!-- slide menu -->
+<div class="slide-menu" id="slideMenu">
+    <div class="accordion" id="accordionMenu">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accPages">📋 Pages</button>
+            </h2>
+            <div id="accPages" class="accordion-collapse collapse" data-bs-parent="#accordionMenu">
+                <div class="accordion-body">
+                    <button class="page-btn" onclick="showPage('earn')"><i class="bi bi-cash-stack"></i> Earn</button>
+                    <button class="page-btn" onclick="showPage('shop')"><i class="bi bi-shop"></i> Shop</button>
+                    <button class="page-btn" onclick="showPage('leaders')"><i class="bi bi-trophy"></i> Leaders</button>
+                    <button class="page-btn" onclick="showPage('help')"><i class="bi bi-question-circle"></i> Help</button>
+                    <button class="page-btn" onclick="showPage('chatpage')"><i class="bi bi-chat"></i> Chat</button>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accAccount">Account</button>
+            </h2>
+            <div id="accAccount" class="accordion-collapse collapse" data-bs-parent="#accordionMenu">
+                <div class="accordion-body">
+                    <button class="page-btn" onclick="showPage('profile')"><i class="bi bi-person"></i> Profile</button>
+                    <button class="page-btn" onclick="showPage('balance')"><i class="bi bi-wallet2"></i> Balance</button>
+                    <button class="page-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HORIZONTAL LOGS -->
+<div class="user-logs-container">
+    <div class="logs-row" id="logsRow"></div>
+</div>
+
+<!-- BOTTOM IMAGE -->
+<div class="image-section-bottom"><img src="https://i.postimg.cc/Y9BwbkrT/Screenshot-2026-03-17-at-4-40-44-PM-removebg-preview.png" alt="banner" loading="lazy"></div>
+
+<!-- STATS -->
+<div class="stats-modern"><div class="stats-card"><div class="stats-row">
+    <div class="stat-item"><span class="stat-number" id="paidTotal">$0.00</span><span class="stat-label">PAID</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat-item"><span class="stat-number" id="userCount">0</span><span class="stat-label">USERS</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat-item"><span class="stat-number" id="tasksDone">0</span><span class="stat-label">TASKS ✓</span></div>
+</div></div></div>
+
+<!-- WHY CHOOSE -->
+<div class="why-section"><div class="why-card"><div class="why-title"><i class="bi bi-star-fill"></i> Why choose iBuxCn</div><div class="why-content"><p><i class="bi bi-check-circle-fill"></i> <span>Variety of tasks: quizzes, CPX, etc.</span></p><p><i class="bi bi-check-circle-fill"></i> <span>Cashout within a week (1 week processing).</span></p></div></div></div>
+
+<!-- FAQ -->
+<div class="faq-section"><div class="faq-card"><div class="faq-header"><h2><i class="bi bi-question-circle-fill"></i> Frequently Asked Questions</h2><p>Have questions? We've got you!</p></div><div class="faq-list"><div class="faq-item"><div class="faq-question"><i class="bi bi-arrow-right-circle"></i> How do I get started?</div><div class="faq-answer">Click menu -> login – that’s it.</div></div><div class="faq-item"><div class="faq-question"><i class="bi bi-arrow-right-circle"></i> Withdrawal fees?</div><div class="faq-answer">Yes! extra 1000 coins.</div></div><div class="faq-item"><div class="faq-question"><i class="bi bi-arrow-right-circle"></i> How long do withdrawals take?</div><div class="faq-answer">Up to 1 week.</div></div></div></div></div>
+
+<!-- PAGE SECTIONS -->
+<section id="earn-page" class="page-section active-page">
+    <div class="page-card"><div class="page-title"><i class="bi bi-cash-stack"></i> Earn</div><div class="page-content"><div class="mock-item"><i class="bi bi-pencil-square"></i> Complete quizzes – earn up to 50 coins</div><div class="mock-item"><i class="bi bi-play-btn"></i> Watch videos – 10 coins each</div><div class="mock-item"><i class="bi bi-person-plus"></i> Refer friends – 200 coins per referral</div></div></div>
+</section>
+<section id="shop-page" class="page-section">
+    <div class="page-card"><div class="page-title"><i class="bi bi-shop"></i> Shop</div><div class="page-content"><div class="mock-item"><i class="bi bi-gift"></i> Gift cards – starting at 5000 coins</div><div class="mock-item"><i class="bi bi-phone"></i> Mobile top-up – coming soon</div><div class="mock-item"><i class="bi bi-cash"></i> PayPal cash – 10,000 coins = $10</div></div></div>
+</section>
+<section id="leaders-page" class="page-section">
+    <div class="page-card"><div class="page-title"><i class="bi bi-trophy"></i> Leaders</div><div class="page-content"><div class="mock-item"><i class="bi bi-1-circle-fill"></i> AlexP – 124,500 coins</div><div class="mock-item"><i class="bi bi-2-circle-fill"></i> SarahK – 98,200 coins</div><div class="mock-item"><i class="bi bi-3-circle-fill"></i> cryptoQueen – 87,400 coins</div></div></div>
+</section>
+<section id="help-page" class="page-section">
+    <div class="page-card"><div class="page-title"><i class="bi bi-question-circle"></i> Help</div><div class="page-content"><div class="mock-item"><i class="bi bi-envelope"></i> Contact support@ibuxcn.com</div><div class="mock-item"><i class="bi bi-file-text"></i> Read our FAQ above</div><div class="mock-item"><i class="bi bi-clock-history"></i> Response time &lt; 24h</div></div></div>
+</section>
+<section id="chatpage-page" class="page-section">
+    <div class="page-card"><div class="page-title"><i class="bi bi-chat"></i> Chat</div><div class="page-content"><div class="mock-item"><i class="bi bi-people"></i> General chat: 142 online</div><div class="mock-item"><i class="bi bi-hash"></i> #earn-tips – latest: "check quizzes"</div><div class="mock-item"><i class="bi bi-emoji-smile"></i> Join the conversation!</div></div></div>
+</section>
+<section id="profile-page" class="page-section">
+    <div class="page-card"><div class="page-title"><i class="bi bi-person"></i> My Profile</div><div class="page-content" id="profileContent">Loading profile...</div></div>
+</section>
+<section id="balance-page" class="page-section">
+    <div class="page-card"><div class="page-title"><i class="bi bi-wallet2"></i> Balance</div><div class="page-content">Your current balance: <span id="balanceDisplay">0.00</span> coins</div></div>
+</section>
+<section id="earnings-page" class="page-section">
+    <div class="page-card"><div class="page-title"><i class="bi bi-cash-stack"></i> Earnings</div><div class="page-content">Total earned: <span id="earningsDisplay">0.00</span> coins</div></div>
+</section>
+
+</div> <!-- end phone-column -->
+</div> <!-- end android-container -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ==================== CONFIGURATION ====================
+    // REPLACE THIS WITH YOUR ACTUAL GOOGLE APPS SCRIPT WEB APP URL
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqjzEQ1TuZ1iQiBV4EFyYBGw0YCrZ1pSZli3VY2JRSPG-AbgIy5Otr38yrYp18X5Rt/exec';
+    
+    // ==================== AUTH STATE ====================
+    let currentUser = null;
+    
+    // Check if user is logged in from session storage
+    (function() {
+        const savedUser = sessionStorage.getItem('ibuxcn_user');
+        if (savedUser) {
+            try {
+                currentUser = JSON.parse(savedUser);
+                updateUIForLoggedInUser();
+                // Load real user data from Google Sheets
+                loadUserData();
+            } catch (e) {
+                sessionStorage.removeItem('ibuxcn_user');
+            }
+        }
+    })();
+
+    // ==================== API CALLS TO GOOGLE SHEETS ====================
+    async function callAppsScript(action, data) {
+        const payload = {
+            action: action,
+            ...data
+        };
+        
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // This is important for Apps Script
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            // With no-cors, we can't read the response directly
+            // So we'll use a different approach - we'll make a GET request to fetch data after login
+            return { success: true };
+        } catch (error) {
+            console.error('API call failed:', error);
+            return { success: false, message: 'Connection failed' };
+        }
+    }
+    
+    async function fetchUserData(userId) {
+        try {
+            // You need to implement a GET endpoint in your Apps Script
+            const response = await fetch(SCRIPT_URL + '?action=getUserData&userId=' + encodeURIComponent(userId));
+            if (response.ok) {
+                return await response.json();
+            }
+            return null;
+        } catch (error) {
+            console.error('Failed to fetch user data:', error);
+            return null;
+        }
+    }
+
+    // ==================== LOGIN MODAL ====================
+    function showLoginModal() {
+        document.getElementById('loginModal').classList.add('active');
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('loginError').style.display = 'none';
+    }
+    
+    function closeLoginModal() {
+        document.getElementById('loginModal').classList.remove('active');
+    }
+    
+    function showRegister() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('registerError').style.display = 'none';
+    }
+    
+    function showLogin() {
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('loginError').style.display = 'none';
+    }
+    
+    // ==================== HANDLE LOGIN ====================
+    async function handleLogin() {
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const loginBtn = document.getElementById('loginBtn');
+        
+        if (!username || !password) {
+            document.getElementById('loginError').textContent = 'Please enter username and password';
+            document.getElementById('loginError').style.display = 'block';
+            return;
+        }
+        
+        // Show loading state
+        loginBtn.innerHTML = '<span class="loading-spinner"></span> Logging in...';
+        loginBtn.disabled = true;
+        
+        try {
+            // For demo purposes - in production, this should validate against your Google Sheets
+            // This is a temporary mock login to show the UI works
+            if (username === 'demo' && password === 'demo') {
+                currentUser = {
+                    id: 'user_' + Date.now(),
+                    username: username,
+                    email: 'demo@example.com'
+                };
+                
+                sessionStorage.setItem('ibuxcn_user', JSON.stringify(currentUser));
+                updateUIForLoggedInUser();
+                closeLoginModal();
+                
+                // Load mock data for demo
+                loadMockUserData();
+            } else {
+                document.getElementById('loginError').textContent = 'Invalid credentials (use demo/demo for testing)';
+                document.getElementById('loginError').style.display = 'block';
+            }
+        } catch (error) {
+            document.getElementById('loginError').textContent = 'Login failed: ' + error;
+            document.getElementById('loginError').style.display = 'block';
+        } finally {
+            loginBtn.innerHTML = 'Login';
+            loginBtn.disabled = false;
+        }
+    }
+    
+    // ==================== HANDLE REGISTER ====================
+    async function handleRegister() {
+        const username = document.getElementById('regUsername').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('regConfirm').value;
+        const email = document.getElementById('regEmail').value.trim();
+        const registerBtn = document.getElementById('registerBtn');
+        
+        if (!username || !password) {
+            document.getElementById('registerError').textContent = 'Username and password required';
+            document.getElementById('registerError').style.display = 'block';
+            return;
+        }
+        
+        if (password !== confirm) {
+            document.getElementById('registerError').textContent = 'Passwords do not match';
+            document.getElementById('registerError').style.display = 'block';
+            return;
+        }
+        
+        // Show loading state
+        registerBtn.innerHTML = '<span class="loading-spinner"></span> Registering...';
+        registerBtn.disabled = true;
+        
+        try {
+            // Mock registration for demo
+            alert('Registration successful! Please login with demo/demo');
+            showLogin();
+        } catch (error) {
+            document.getElementById('registerError').textContent = 'Registration error: ' + error;
+            document.getElementById('registerError').style.display = 'block';
+        } finally {
+            registerBtn.innerHTML = 'Register';
+            registerBtn.disabled = false;
+        }
+    }
+    
+    // ==================== MOCK DATA FOR DEMO ====================
+    function loadMockUserData() {
+        // Mock data for demonstration
+        document.getElementById('mainBalance').textContent = '1250.50';
+        document.getElementById('ptsBalance').textContent = '350.75';
+        document.getElementById('balanceDisplay').textContent = '1250.50';
+        document.getElementById('earningsDisplay').textContent = '1250.50';
+        
+        document.getElementById('paidTotal').textContent = '$125.50';
+        document.getElementById('userCount').textContent = '1243';
+        document.getElementById('tasksDone').textContent = '47';
+        
+        document.getElementById('profileBalance').textContent = '1250.50';
+        document.getElementById('profilePts').textContent = '350.75';
+        document.getElementById('profileTasks').textContent = '47';
+        
+        // Update logs
+        const logs = [
+            { prefix: '📝', value: 'quiz', suffix: '+50' },
+            { prefix: '📺', value: 'video', suffix: '+10' },
+            { prefix: '👥', value: 'referral', suffix: '+200' }
+        ];
+        let logsHtml = '';
+        logs.forEach((log, idx) => {
+            logsHtml += `<div class="log-item"><span class="log-prefix">${log.prefix}</span><span class="log-value">${log.value}</span><span class="log-suffix">${log.suffix}</span></div>`;
+            if (idx < logs.length - 1) logsHtml += '<span class="log-divider">|</span>';
+        });
+        document.getElementById('logsRow').innerHTML = logsHtml;
+        
+        // Update notifications
+        document.getElementById('notifMessage').innerHTML = '<i class="bi bi-check-circle"></i> Welcome back! You have 3 new notifications';
+        document.getElementById('notifyCount').textContent = '3';
+        
+        // Update chat
+        const messages = [
+            { user: 'Alex', text: 'Anyone doing quizzes?', timestamp: Date.now() - 3600000 },
+            { user: 'Sarah', text: 'Just completed 5 tasks!', timestamp: Date.now() - 1800000 },
+            { user: 'Mike', text: 'New code: BONUS50', timestamp: Date.now() - 900000 }
+        ];
+        let chatHtml = '';
+        messages.forEach(msg => {
+            chatHtml += `<div class="chat-message"><strong>${msg.user}:</strong> ${msg.text} <small>${new Date(msg.timestamp).toLocaleTimeString()}</small></div>`;
+        });
+        document.getElementById('chatMessagesContainer').innerHTML = chatHtml;
+        
+        // Update profile
+        document.getElementById('profileContent').innerHTML = `
+            <div class="mock-item"><i class="bi bi-person"></i> Username: demo</div>
+            <div class="mock-item"><i class="bi bi-envelope"></i> Email: demo@example.com</div>
+            <div class="mock-item"><i class="bi bi-calendar"></i> Member since: ${new Date().toLocaleDateString()}</div>
+            <div class="mock-item"><i class="bi bi-trophy"></i> Total Earned: 1250.50 coins</div>
+            <div class="mock-item"><i class="bi bi-check-circle"></i> Tasks Completed: 47</div>
+        `;
+    }
+    
+    // ==================== LOAD USER DATA FROM SHEETS ====================
+    async function loadUserData() {
+        if (!currentUser) return;
+        
+        // In production, this would fetch from your Google Sheets
+        // For now, use mock data
+        loadMockUserData();
+    }
+    
+    // ==================== LOGOUT ====================
+    function logout() {
+        currentUser = null;
+        sessionStorage.removeItem('ibuxcn_user');
+        document.getElementById('userInfoContainer').style.display = 'none';
+        document.getElementById('profileDropdown').classList.remove('active');
+        document.getElementById('mainBalance').textContent = '0.00';
+        document.getElementById('ptsBalance').textContent = '0.00';
+        document.getElementById('paidTotal').textContent = '$0.00';
+        document.getElementById('userCount').textContent = '0';
+        document.getElementById('tasksDone').textContent = '0';
+        document.getElementById('logsRow').innerHTML = '';
+        document.getElementById('notifyCount').textContent = '0';
+        document.getElementById('chatMessagesContainer').innerHTML = 'No messages yet. Start the conversation!';
+        showPage('earn');
+        closeAllMenus();
+    }
+    
+    // ==================== UPDATE UI AFTER LOGIN ====================
+    function updateUIForLoggedInUser() {
+        if (currentUser) {
+            document.getElementById('userInfoContainer').style.display = 'block';
+            document.getElementById('userNameDisplay').textContent = currentUser.username || 'User';
+            document.getElementById('profileName').textContent = currentUser.username || 'User';
+            document.getElementById('profileEmail').textContent = currentUser.email || 'No email';
+            document.getElementById('profileAvatar').textContent = (currentUser.username || 'U').charAt(0).toUpperCase();
+        }
+    }
+    
+    // ==================== REDEEM CODE ====================
+    async function redeemCode() {
+        if (!currentUser) {
+            alert('Please login first');
+            closePopup();
+            showLoginModal();
+            return;
+        }
+        
+        const code = document.getElementById('redeemCode').value.trim();
+        if (!code) {
+            alert('Enter a code');
+            return;
+        }
+        
+        const redeemBtn = document.getElementById('redeemBtn');
+        redeemBtn.innerHTML = '<span class="loading-spinner"></span> Redeeming...';
+        redeemBtn.disabled = true;
+        
+        try {
+            // Mock redemption
+            setTimeout(() => {
+                alert('Code redeemed successfully! You received 100 coins!');
+                loadMockUserData();
+                document.getElementById('redeemCode').value = '';
+                closePopup();
+                redeemBtn.innerHTML = 'Redeem';
+                redeemBtn.disabled = false;
+            }, 1000);
+        } catch (error) {
+            alert('Error redeeming code: ' + error);
+            redeemBtn.innerHTML = 'Redeem';
+            redeemBtn.disabled = false;
+        }
+    }
+    
+    // ==================== OTHER FUNCTIONS ====================
+    function closeAllMenus() {
+        const menu = document.getElementById('slideMenu');
+        const overlay = document.getElementById('overlay');
+        const dropdown = document.getElementById('profileDropdown');
+        const notifDropdown = document.getElementById('notifDropdown');
+        
+        menu.style.display = 'none';
+        overlay.style.display = 'none';
+        dropdown.classList.remove('active');
+        notifDropdown.style.display = 'none';
+    }
+
+    function toggleMenu() {
+        const menu = document.getElementById('slideMenu');
+        const overlay = document.getElementById('overlay');
+        const isVisible = menu.style.display === 'block';
+        
+        if (isVisible) {
+            menu.style.display = 'none';
+            overlay.style.display = 'none';
+        } else {
+            menu.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+    }
+
+    function toggleProfileDropdown() {
+        const dropdown = document.getElementById('profileDropdown');
+        dropdown.classList.toggle('active');
+    }
+
+    // Redeem popup
+    function openPopup() { 
+        if (!currentUser) {
+            alert('Please login first');
+            showLoginModal();
+            return;
+        }
+        document.getElementById('popupContainer').style.display = 'block'; 
+        document.getElementById('popupOverlay').style.display = 'block'; 
+        document.getElementById('redeemCode').value = '';
+    }
+    
+    function closePopup() { 
+        document.getElementById('popupContainer').style.display = 'none'; 
+        document.getElementById('popupOverlay').style.display = 'none'; 
+    }
+
+    // Notifications
+    function toggleNotifications() {
+        const notifDropdown = document.getElementById('notifDropdown');
+        notifDropdown.style.display = notifDropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Chat
+    function openChat() {
+        document.getElementById('chatPanel').classList.add('open');
+        document.getElementById('notifDropdown').style.display = 'none';
+    }
+    
+    function closeChat() {
+        document.getElementById('chatPanel').classList.remove('open');
+    }
+
+    // Show page
+    function showPage(pageId) {
+        document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active-page'));
+        const activeSection = document.getElementById(pageId + '-page');
+        if (activeSection) activeSection.classList.add('active-page');
+        closeAllMenus();
+    }
+
+    window.addEventListener('load', () => { 
+        showPage('earn'); 
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeAllMenus();
+            if (document.getElementById('popupContainer').style.display === 'block') closePopup();
+            if (document.getElementById('chatPanel').classList.contains('open')) closeChat();
+            document.getElementById('loginModal').classList.remove('active');
+        }
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('profileDropdown');
+        const userInfo = document.getElementById('userInfoContainer');
+        const notifDropdown = document.getElementById('notifDropdown');
+        const notifIcon = document.querySelector('.right-icons .icon-box:nth-child(2)');
+        
+        if (dropdown && userInfo && !userInfo.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('active');
+        }
+        
+        if (notifDropdown && notifIcon && !notifIcon.contains(e.target) && !notifDropdown.contains(e.target)) {
+            notifDropdown.style.display = 'none';
+        }
+    });
+</script>
 </body>
 </html>
